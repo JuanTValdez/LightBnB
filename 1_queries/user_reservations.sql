@@ -7,3 +7,5 @@ AND reservations.end_date < now()::date
 GROUP BY properties.id, reservations.id
 ORDER BY reservations.start_date
 LIMIT 10;
+
+
