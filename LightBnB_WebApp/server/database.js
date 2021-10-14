@@ -108,7 +108,7 @@ const getAllReservations = function (guest_id, limit = 10) {
     });
 };
 
-getAllReservations(1, 10);
+// getAllReservations(1, 10);
 exports.getAllReservations = getAllReservations;
 
 /// Properties
@@ -119,18 +119,86 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>} A promise to the properties.
  */
-const getAllProperties = (options, limit = 10) => {
-  return pool
-    .query(`SELECT * FROM properties LIMIT $1`, [limit])
-    .then((result) => {
-      // console.log(result.rows);
-      return result.rows;
-    })
-    .catch((err) => {
-      console.log(err.message);
-    });
+
+const getAllProperties = function (options, limit = 10) {
+  console.log("hi: ", options);
+  const queryParams = [];
+  let queryString = `
+SELECT properties.*, avg(property_reviews.rating) as average_rating
+FROM properties
+JOIN property_reviews ON properties.id = property_id
+`;
+  if (options.city) {
+    queryParams.push(`%${options.city}%`);
+
+    if (`${queryParams.length}` >= 0) {
+      queryString += `WHERE city LIKE $${queryParams.length} `;
+    } else {
+      queryString += `AND city LIKE $${queryParams.length}`;
+    }
+  }
+
+  if (options.owner_id) {
+    queryParams.push(options.owner_id);
+
+    if (`${queryParams.length}` === 1) {
+      queryString += `WHERE owner_id = $${queryParams.length} `;
+    } else {
+      queryString += `AND owner_id = $${queryParams.length}`;
+    }
+  }
+
+  if (options.minimum_price_per_night) {
+    queryParams.push(options.minimum_price_per_night);
+
+    if (`${queryParams.length}` === 1) {
+      queryString += `WHERE cost_per_night >= $${queryParams.length} `;
+    } else {
+      queryString += ` AND cost_per_night >= $${queryParams.length}`;
+    }
+  }
+
+  if (options.maximum_price_per_night) {
+    queryParams.push(options.maximum_price_per_night);
+
+    if (`${queryParams.length}` === 1) {
+      queryString += `WHERE cost_per_night <= $${queryParams.length} `;
+    } else {
+      queryString += ` AND cost_per_night <= $${queryParams.length}`;
+    }
+  }
+
+  if (options.minimum_rating) {
+    queryParams.push(options.minimum_rating);
+
+    if (`${queryParams.length}` === 1) {
+      queryString += `WHERE rating >= $${query.Params.length}`;
+    } else {
+      queryString += ` AND rating >= $${queryParams.length}`;
+    }
+  }
+
+  queryParams.push(limit);
+  queryString += `
+  GROUP BY properties.id
+  ORDER BY cost_per_night
+  LIMIT $${queryParams.length};
+  `;
+  // console.log(Object.keys(options));
+  // console.log(queryString, queryParams);
+  // console.log("issue");
+
+  return pool.query(queryString, queryParams).then((res) => res.rows);
 };
 exports.getAllProperties = getAllProperties;
+
+getAllProperties({
+  city: "Columbus",
+  owner_id: 1,
+  minimum_price_per_night: 400,
+  maximum_price_per_night: 40000,
+  minimum_rating: 3,
+});
 
 /**
  * Add a property to the database
@@ -145,29 +213,10 @@ const addProperty = function (property) {
 };
 exports.addProperty = addProperty;
 
-// MY LAST ONE
-
-// SELECT users.name, properties.*, reservations.*, property_reviews.*
-//       FROM reservations
-//       JOIN properties ON reservations.property_id = properties.id
-//       JOIN property_reviews ON property_reviews.property_id = properties.id
-//       JOIN properties ON
-//       JOIN users ON reservations.guest_id = users.id
-//       WHERE users.id = $1
-//       AND reservations.end_date > now()::date
-//       GROUP BY users.id, properties.id, property_reviews.id,reservations.id
-//       ORDER BY users.id
-//       LIMIT $2;`
-
-// When I did FROM product_reviews instead.
-
-// `SELECT users.name, properties.*, reservations.*, property_reviews.*
-//       FROM property_reviews
-//       JOIN reservations ON property_reviews.reservation_id = reservations.id
-//       JOIN properties ON property_reviews.property_id = properties.id
-//       JOIN users ON reservations.guest_id = users.id
-//       WHERE users.id = $1
-//       AND reservations.end_date > now()::date
-//       GROUP BY users.id, properties.id, property_reviews.id,reservations.id
-//       ORDER BY users.id
-//       LIMIT $2;`
+// SELECT properties.*, avg(property_reviews.rating) as average_rating
+// FROM properties
+// JOIN property_reviews ON properties.id = property_id
+// WHERE city LIKE '%Columbus%' AND owner_id = 1 AND cost_per_night >= 400 AND cost_per_night <= 40000 AND rating >= 3
+//   GROUP BY properties.id
+//   ORDER BY cost_per_night
+//   LIMIT 10;
