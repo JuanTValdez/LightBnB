@@ -84,21 +84,20 @@ exports.addUser = addUser;
  * @param {string} guest_id The id of the user.
  * @return {Promise<[{}]>} A promise to the reservations.
  */
+
 const getAllReservations = function (guest_id, limit = 10) {
   return pool
     .query(
-      `SELECT properties.title,reservations.start_date, reservations.end_date
+      `SELECT users.name, properties.*, reservations.*
       FROM reservations
       JOIN properties ON reservations.property_id = properties.id
-      WHERE reservations.guest_id = $1
+      JOIN users ON reservations.guest_id = users.id
+      WHERE users.id = $1
       AND reservations.end_date > now()::date
-      GROUP BY properties.title, reservations.id
-      ORDER BY reservations.guest_id
-      LIMIT 10;`,
-      [
-        `${guest_id}`,
-        // , `${limit}`
-      ]
+      GROUP BY users.id, properties.id, reservations.id
+      ORDER BY users.id
+      LIMIT $2;`,
+      [`${guest_id}`, `${limit}`]
     )
     .then((result) => {
       console.log(result.rows);
@@ -109,7 +108,7 @@ const getAllReservations = function (guest_id, limit = 10) {
     });
 };
 
-getAllReservations(2);
+getAllReservations(1, 10);
 exports.getAllReservations = getAllReservations;
 
 /// Properties
@@ -145,3 +144,30 @@ const addProperty = function (property) {
   return Promise.resolve(property);
 };
 exports.addProperty = addProperty;
+
+// MY LAST ONE
+
+// SELECT users.name, properties.*, reservations.*, property_reviews.*
+//       FROM reservations
+//       JOIN properties ON reservations.property_id = properties.id
+//       JOIN property_reviews ON property_reviews.property_id = properties.id
+//       JOIN properties ON
+//       JOIN users ON reservations.guest_id = users.id
+//       WHERE users.id = $1
+//       AND reservations.end_date > now()::date
+//       GROUP BY users.id, properties.id, property_reviews.id,reservations.id
+//       ORDER BY users.id
+//       LIMIT $2;`
+
+// When I did FROM product_reviews instead.
+
+// `SELECT users.name, properties.*, reservations.*, property_reviews.*
+//       FROM property_reviews
+//       JOIN reservations ON property_reviews.reservation_id = reservations.id
+//       JOIN properties ON property_reviews.property_id = properties.id
+//       JOIN users ON reservations.guest_id = users.id
+//       WHERE users.id = $1
+//       AND reservations.end_date > now()::date
+//       GROUP BY users.id, properties.id, property_reviews.id,reservations.id
+//       ORDER BY users.id
+//       LIMIT $2;`
