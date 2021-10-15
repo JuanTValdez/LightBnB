@@ -1,13 +1,13 @@
-const properties = require("./json/properties.json");
-const users = require("./json/users.json");
+const properties = require('./json/properties.json');
+const users = require('./json/users.json');
 
-const { Pool } = require("pg");
+const { Pool } = require('pg');
 
 const pool = new Pool({
-  user: "vagrant",
-  password: "123",
-  host: "localhost",
-  database: "lightbnb",
+  user: 'vagrant',
+  password: '123',
+  host: 'localhost',
+  database: 'lightbnb',
 });
 
 /// Users
@@ -17,7 +17,7 @@ const getUserWithEmail = function (email) {
     .query(`SELECT * FROM users WHERE email = $1`, [email])
     .then((result) => {
       if (email == null) {
-        console.log("email cannot be null!!");
+        console.log('email cannot be null!!');
         // return result.rows;
       } else {
         console.log(result.rows[0]);
@@ -37,15 +37,13 @@ exports.getUserWithEmail = getUserWithEmail;
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithId = function (id) {
-  console.log("Some string before id " + id);
   return pool
     .query(`SELECT * FROM users WHERE id = $1`, [id])
     .then((result) => {
       if (id == null) {
-        console.log("User id cannot be null!");
+        console.log('User id cannot be null!');
         return result.rows[0];
       } else {
-        console.log("string " + result.rows[0]);
         return result.rows[0];
       }
     })
@@ -206,7 +204,7 @@ exports.getAllProperties = getAllProperties;
  */
 
 const addProperty = function (property) {
-  console.log("hi: ", property);
+  console.log('hi: ', property);
 
   return pool
     .query(
@@ -237,3 +235,26 @@ const addProperty = function (property) {
     });
 };
 exports.addProperty = addProperty;
+
+const addReservation = function (reservation) {
+  console.log('Reservation: ', reservation);
+  return pool
+    .query(
+      `
+    INSERT INTO reservations (start_date, end_date, property_id, guest_id)
+    VALUES ($1, $2, $3, $4) RETURNING *;
+  `,
+      [
+        reservation.start_date,
+        reservation.end_date,
+        reservation.property_id,
+        reservation.guest_id,
+      ]
+    )
+    .then((res) => res.rows[0])
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
+
+exports.addReservation = addReservation;

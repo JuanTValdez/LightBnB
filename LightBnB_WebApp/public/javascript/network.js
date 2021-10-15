@@ -1,37 +1,37 @@
 function getMyDetails() {
-  console.log("getMyDetails");
+  console.log('getMyDetails');
   return $.ajax({
-    url: "/users/me",
+    url: '/users/me',
   });
 }
 
 function logOut() {
   return $.ajax({
-    method: "POST",
-    url: "/users/logout",
-  })
+    method: 'POST',
+    url: '/users/logout',
+  });
 }
 
 function logIn(data) {
   return $.ajax({
-    method: "POST",
-    url: "/users/login",
-    data
+    method: 'POST',
+    url: '/users/login',
+    data,
   });
 }
 
 function signUp(data) {
   return $.ajax({
-    method: "POST",
-    url: "/users",
-    data
+    method: 'POST',
+    url: '/users',
+    data,
   });
 }
 
 function getAllListings(params) {
-  let url = "/api/properties";
+  let url = '/api/properties';
   if (params) {
-    url += "?" + params;
+    url += '?' + params;
   }
   return $.ajax({
     url,
@@ -39,16 +39,24 @@ function getAllListings(params) {
 }
 
 function getAllReservations() {
-  let url = "/api/reservations";
+  let url = '/api/reservations';
   return $.ajax({
     url,
   });
 }
 
-const submitProperty = function(data) {
+const submitProperty = function (data) {
   return $.ajax({
-    method: "POST",
-    url: "/api/properties",
+    method: 'POST',
+    url: '/api/properties',
     data,
   });
-}
+};
+
+const submitReservation = function (data) {
+  return $.ajax({
+    method: 'POST',
+    url: '/api/reservations',
+    data,
+  });
+};
