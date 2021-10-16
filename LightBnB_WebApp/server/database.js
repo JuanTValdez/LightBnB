@@ -84,29 +84,19 @@ exports.addUser = addUser;
  */
 
 const getAllReservations = function (guest_id, limit = 10) {
-  return pool
-    .query(
-      `SELECT users.name, properties.*, reservations.*
-      FROM reservations
-      JOIN properties ON reservations.property_id = properties.id
-      JOIN users ON reservations.guest_id = users.id
-      WHERE users.id = $1
-      AND reservations.end_date > now()::date
-      GROUP BY users.id, properties.id, reservations.id
-      ORDER BY users.id
-      LIMIT $2;`,
-      [`${guest_id}`, `${limit}`]
-    )
-    .then((result) => {
-      console.log(result.rows);
-      return result.rows;
-    })
-    .catch((err) => {
-      console.log(err.message);
-    });
+  const queryString = `
+  SELECT properties.*, reservations.*, avg(rating) as average_rating
+  FROM reservations
+  JOIN properties ON reservations.property_id = properties.id
+  JOIN property_reviews ON properties.id = property_reviews.property_id 
+  WHERE reservations.guest_id = $1
+  AND reservations.start_date < now()::date
+  GROUP BY properties.id, reservations.id
+  ORDER BY reservations.start_date
+  LIMIT $2;`;
+  const params = [guest_id, limit];
+  return pool.query(queryString, params).then((res) => res.rows);
 };
-
-// getAllReservations(1, 10);
 exports.getAllReservations = getAllReservations;
 
 /// Properties
@@ -258,3 +248,33 @@ const addReservation = function (reservation) {
 };
 
 exports.addReservation = addReservation;
+
+//
+//  Gets upcoming reservations
+//
+const getUpcomingReservations = function (guest_id, limit = 10) {
+  const queryString = `
+  SELECT properties.*, reservations.*, avg(rating) as average_rating
+  FROM reservations
+  JOIN properties ON reservations.property_id = properties.id
+  JOIN property_reviews ON properties.id = property_reviews.property_id 
+  WHERE reservations.guest_id = $1
+  AND reservations.start_date > now()::date
+  GROUP BY properties.id, reservations.id
+  ORDER BY reservations.start_date
+  LIMIT $2;`;
+  const params = [guest_id, limit];
+  return pool.query(queryString, params).then((res) => res.rows);
+};
+
+exports.getUpcomingReservations = getUpcomingReservations;
+
+//
+//  Updates an existing reservation with new information
+//
+const updateReservation = function (reservationId, newReservationData) {};
+
+//
+//  Deletes an existing reservation
+//
+const deleteReservation = function (reservationId) {};
