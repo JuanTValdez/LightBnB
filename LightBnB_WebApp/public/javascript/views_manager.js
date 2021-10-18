@@ -11,9 +11,11 @@ $(() => {
     $signUpForm.detach();
     $newReservationForm.detach();
     $updateReservationForm.detach();
+    $('#reservation-details').detach();
     let dataTag = '';
     switch (item) {
       case 'listings':
+        console.log('Smishtings');
         $propertyListings.appendTo($main);
         break;
       case 'newProperty':
@@ -30,6 +32,7 @@ $(() => {
         break;
       case 'newReservation':
         dataTag = `<h4>${data}</h4>`;
+
         $newReservationForm.appendTo($main);
         $(dataTag).appendTo('#datatag');
         break;
@@ -43,10 +46,10 @@ $(() => {
         const reservationDetails = `
             <div id="reservation-details">
               <h3>Reservation Details</h3>
-              <h4>Start date: ${moment(data.start_date).format(
+              <h4>Start date: ${moment(data.start_date.substring(0, 10)).format(
                 'MMMM DD, YYYY'
               )}</h4>
-              <h4>End date: ${moment(data.end_date).format(
+              <h4>End date: ${moment(data.end_date.substring(0, 10)).format(
                 'MMMM DD, YYYY'
               )}</h4>
             </div>
@@ -55,6 +58,7 @@ $(() => {
         const errorMessage = data.error_message
           ? `<h4>${data.error_message}</h4>`
           : ``;
+
         $(reservationDetails).appendTo($main);
         $updateReservationForm.appendTo($main);
         $(dataTag).appendTo('#datatag');

@@ -164,7 +164,7 @@ $(() => {
     const formArray = $(this).serializeArray();
     const startDate = `${formArray[2].value}-${formArray[1].value}-${formArray[0].value}`;
     const endDate = `${formArray[5].value}-${formArray[4].value}-${formArray[3].value}`;
-    let propertyId = (propertyId = $(this).find('#datatag h4').first().text());
+    let propertyId = $(this).find('#datatag h4').first().text();
 
     const dataObj = {
       start_date: startDate,

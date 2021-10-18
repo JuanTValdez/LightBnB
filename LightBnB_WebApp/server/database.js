@@ -317,4 +317,4 @@ const deleteReservation = function (reservationId) {
     .catch(() => console.error(err));
 };
 
-exports.description = deleteReservation;
+exports.deleteReservation = deleteReservation;

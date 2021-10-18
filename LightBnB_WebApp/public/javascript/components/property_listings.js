@@ -30,7 +30,7 @@ $(() => {
     }
 
     if (isReservation) {
-      // $('.update-button').on('click', function () {
+      // $('.update-button').on('click', function () {.show
       //   const idData = $(this).attr('id').substring(16);
       //   console.log(`update ${idData}`);
       // });
@@ -44,6 +44,22 @@ $(() => {
 
       $('.delete-button').on('click', function () {
         const idData = $(this).attr('id').substring(16);
+        deleteReservation({ reservation_id: idData }).then((data) => {
+          console.log(`updated reservation: ${data}`);
+          views_manager.show('none');
+          propertyListings.clearListings();
+          getFulfilledReservations().then(function (json) {
+            propertyListings.addProperties(json.reservations, {
+              upcoming: false,
+            });
+            getUpcomingReservations().then((json) => {
+              propertyListings.addProperties(json.reservations, {
+                upcoming: true,
+              });
+            });
+            views_manager.show('listings');
+          });
+        });
         console.log(`delete ${idData}`);
       });
     }
