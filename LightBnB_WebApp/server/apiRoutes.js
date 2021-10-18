@@ -50,6 +50,22 @@ module.exports = function (router, database) {
       });
   });
 
+  router.get('/reviews/:propertyId', (req, res) => {
+    const propertyId = req.params.propertyId;
+    database.getReviewsByProperty(propertyId).then((reviews) => {
+      res.send(reviews);
+    });
+  });
+
+  // get reviews by property
+  // router.get('/reviews/:propertyId', (req, res) => {
+  //   const propertyId = req.params.propertyId
+  //   database.getReviewsByProperty(propertyId)
+  //   .then(reviews => {
+  //     res.send(reviews);
+  //   })
+  // })
+
   router.post('/reservations', (req, res) => {
     const userId = req.session.userId;
     if (userId) {
@@ -92,6 +108,13 @@ module.exports = function (router, database) {
         console.error(e);
         res.send(e);
       });
+  });
+
+  router.post('/reviews/:reservationId', (req, res) => {
+    const reservationId = req.params.reservationId;
+    database.addReview({ ...req.body, reservationId }).then((review) => {
+      res.send(review);
+    });
   });
 
   return router;

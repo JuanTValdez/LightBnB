@@ -39,6 +39,18 @@ $(() => {
               `
                 : ``
             }
+            ${
+              isReservation && !isReservation.upcoming
+                ? `<button class='add-review-button' id="add-review-${property.id}">Add a Review</button>`
+                : ``
+            } 
+            ${
+              !isReservation
+                ? `<span id="review-details-${property.id}" class="review_details">
+              Browse ${property.review_count} reviews
+            </span>`
+                : ``
+            }
           </footer>
         </section>
       </article>

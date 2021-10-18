@@ -11,11 +11,14 @@ $(() => {
     $signUpForm.detach();
     $newReservationForm.detach();
     $updateReservationForm.detach();
+    $newReviewForm.detach();
+    $propertyReviews.detach();
+
     $('#reservation-details').detach();
+
     let dataTag = '';
     switch (item) {
       case 'listings':
-        console.log('Smishtings');
         $propertyListings.appendTo($main);
         break;
       case 'newProperty':
@@ -63,6 +66,19 @@ $(() => {
         $updateReservationForm.appendTo($main);
         $(dataTag).appendTo('#datatag');
         $(errorMessage).appendTo('#error-message');
+        break;
+
+      case 'showReviews':
+        getReviewsByProperty(data).then((reviews) =>
+          propertyReviews.addReviews(reviews)
+        );
+        $propertyReviews.appendTo($main);
+        break;
+
+      case 'newReview':
+        dataTag = `<h4>${data}</h4>`;
+        $newReviewForm.appendTo($main);
+        $(dataTag).appendTo('#datatag');
         break;
 
       case 'error': {
