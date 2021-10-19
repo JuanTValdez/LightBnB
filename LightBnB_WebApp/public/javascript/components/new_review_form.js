@@ -11,24 +11,28 @@ $(() => {
         <option value="4">4 stars</option>
         <option value="5">5 stars</option>
       </select>
-      <div id="datatag" class="hidden"></div>
+      <div id="datatag" class="hidden" ></div>
       <button type="submit">Submit</button>
     </form>
   `);
 
-  $newReviewForm.on('submit', function (event) {
+  $newReviewForm.on('submit', function(event) {
     event.preventDefault();
     const reviewBody = $('#new-review-body').val();
     const reviewRating = $('#new-review-rating').val();
-    const reservationId = $('#datatag h4').text();
+    const reservationId = $('#datatag h4').last().text();
     // clear our review fields
-    $('#new-review-rating').val('');
-    $('#new-review-body').val('');
+    $('#new-review-rating').val("");
+    $('#new-review-body').val("");
+    console.log("word " + reviewRating)
     if (reviewRating && reservationId) {
-      getIndividualReservation(reservationId).then((data) => {
+      getIndividualReservation(reservationId).then(data => {
+        const reservation = data;
+
+        console.log('!!! ' + data);
         const dataObj = {
-          ...data,
-          reservationId: data.id,
+          ...reservation,
+          reservationId: reservation.id,
           message: reviewBody,
           rating: reviewRating,
         };
