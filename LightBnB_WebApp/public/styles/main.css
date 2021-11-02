@@ -94,4 +94,13 @@
   display: none;
 }
 
+.review_details {
+  color: blue;
+}
+
+.property-review__details {
+  border: 2px solid black;
+  margin-bottom: 10px;
+}
+
 /*# sourceMappingURL=main.css.map */
